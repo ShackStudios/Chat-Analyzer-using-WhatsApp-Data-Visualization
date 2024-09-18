@@ -8,22 +8,18 @@ def preprocess(data):
     dates = re.findall(pattern, data)
 
     df = pd.DataFrame({'user_message': messages, 'message_date': dates})
-
-    # convert message_data type
+    # convert message_date type
     df['message_date'] = pd.to_datetime(df['message_date'], format='%d/%m/%Y, %H:%M - ')
 
     df.rename(columns={'message_date': 'date'}, inplace=True)
 
-    df.head()
-
-    # separate users and messages
     users = []
     messages = []
     for message in df['user_message']:
         entry = re.split('([\w\W]+?):\s', message)
         if entry[1:]:  # user name
             users.append(entry[1])
-            messages.append(entry[2])
+            messages.append(" ".join(entry[2:]))
         else:
             users.append('group_notification')
             messages.append(entry[0])
