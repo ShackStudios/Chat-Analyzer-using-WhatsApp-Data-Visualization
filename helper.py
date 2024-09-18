@@ -6,28 +6,28 @@ import emoji
 
 extract = URLExtract()
 
-def fetch_stats(selected_user,df):
+import os
 
-    if selected_user != 'Overall':
-        df = df[df['user'] == selected_user]
+def fetch_stats(selected_user, df):
+    # Use a relative path to the file
+    file_path = os.path.join(os.path.dirname(__file__), 'stop_hinglish.txt')
+    
+    # Ensure the file exists before attempting to open it
+    if not os.path.isfile(file_path):
+        raise FileNotFoundError(f"The file {file_path} does not exist.")
+    
+    with open(file_path, 'r') as f:
+        # Your existing code to process the file
+        # For example:
+        stop_words = f.read().splitlines()
+        # Process stop_words and continue with your function logic
+        # ...
+        pass
 
-    # fetch the number of messages
-    num_messages = df.shape[0]
+    # Return the required values
+    return num_messages, words, num_media_messages, num_links
 
-    # fetch the total number of words
-    words = []
-    for message in df['message']:
-        words.extend(message.split())
 
-    # fetch number of media messages
-    num_media_messages = df[df['message'] == '<Media omitted>\n'].shape[0]
-
-    # fetch number of links shared
-    links = []
-    for message in df['message']:
-        links.extend(extract.find_urls(message))
-
-    return num_messages,len(words),num_media_messages,len(links)
 
 def most_busy_users(df):
     x = df['user'].value_counts().head()
