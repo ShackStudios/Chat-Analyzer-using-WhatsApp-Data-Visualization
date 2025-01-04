@@ -3,16 +3,25 @@ import preprocessor, helper
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# Load custom CSS
+def load_css(file_name):
+    with open(file_name) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+# Load the CSS
+load_css("styles.css")
+
+# Sidebar Title
 st.sidebar.title("WhatsApp Chat Analyzer")
 
-# File upload
+# File Upload
 uploaded_file = st.sidebar.file_uploader("Choose a file")
 if uploaded_file is not None:
     bytes_data = uploaded_file.getvalue()
     data = bytes_data.decode("utf-8")
     df = preprocessor.preprocess(data)
 
-    # Fetch unique users and sort
+    # Fetch unique users
     user_list = df['user'].unique().tolist()
     if 'group_notification' in user_list:
         user_list.remove('group_notification')
@@ -21,28 +30,43 @@ if uploaded_file is not None:
 
     selected_user = st.sidebar.selectbox("Show analysis wrt", user_list)
 
+    # Show Analysis Button
     if st.sidebar.button("Show Analysis"):
+        # Header Section
+        st.markdown("""
+        <div class="container">
+            <div class="header">
+                <h1>WhatsApp Chat Analyzer</h1>
+                <p>Get insights into your chat conversations!</p>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
-        # Stats Area
+        # Top Statistics
         num_messages, words, num_media_messages, num_links = helper.fetch_stats(selected_user, df)
-        st.title("Top Statistics")
-        col1, col2, col3, col4 = st.columns(4)
-
-        with col1:
-            st.header("Total Messages")
-            st.title(num_messages)
-        with col2:
-            st.header("Total Words")
-            st.title(words)
-        with col3:
-            st.header("Media Shared")
-            st.title(num_media_messages)
-        with col4:
-            st.header("Links Shared")
-            st.title(num_links)
+        st.markdown(f"""
+        <div class="flex-container">
+            <div class="metric-card">
+                <h2>Total Messages</h2>
+                <p>{num_messages}</p>
+            </div>
+            <div class="metric-card">
+                <h2>Total Words</h2>
+                <p>{words}</p>
+            </div>
+            <div class="metric-card">
+                <h2>Media Shared</h2>
+                <p>{num_media_messages}</p>
+            </div>
+            <div class="metric-card">
+                <h2>Links Shared</h2>
+                <p>{num_links}</p>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
         # Monthly Timeline
-        st.title("Monthly Timeline")
+        st.markdown("<div class='chart-container'><h2>Monthly Timeline</h2></div>", unsafe_allow_html=True)
         timeline = helper.monthly_timeline(selected_user, df)
         fig, ax = plt.subplots()
         ax.plot(timeline['time'], timeline['message'], color='green')
@@ -50,7 +74,7 @@ if uploaded_file is not None:
         st.pyplot(fig)
 
         # Daily Timeline
-        st.title("Daily Timeline")
+        st.markdown("<div class='chart-container'><h2>Daily Timeline</h2></div>", unsafe_allow_html=True)
         daily_timeline = helper.daily_timeline(selected_user, df)
         fig, ax = plt.subplots()
         ax.plot(daily_timeline['only_date'], daily_timeline['message'], color='black')
@@ -58,11 +82,11 @@ if uploaded_file is not None:
         st.pyplot(fig)
 
         # Activity Map
-        st.title('Activity Map')
+        st.markdown("<div class='chart-container'><h2>Activity Map</h2></div>", unsafe_allow_html=True)
         col1, col2 = st.columns(2)
 
         with col1:
-            st.header("Most busy day")
+            st.markdown("<h3>Most Busy Day</h3>", unsafe_allow_html=True)
             busy_day = helper.week_activity_map(selected_user, df)
             fig, ax = plt.subplots()
             ax.bar(busy_day.index, busy_day.values, color='purple')
@@ -70,100 +94,30 @@ if uploaded_file is not None:
             st.pyplot(fig)
 
         with col2:
-            st.header("Most busy month")
+            st.markdown("<h3>Most Busy Month</h3>", unsafe_allow_html=True)
             busy_month = helper.month_activity_map(selected_user, df)
             fig, ax = plt.subplots()
             ax.bar(busy_month.index, busy_month.values, color='orange')
             plt.xticks(rotation='vertical')
             st.pyplot(fig)
 
-        # Weekly Activity Map
-        st.title("Weekly Activity Map")
-        user_heatmap = helper.activity_heatmap(selected_user, df)
-        fig, ax = plt.subplots()
-        sns.heatmap(user_heatmap, ax=ax, cmap="coolwarm")
-        st.pyplot(fig)
-
-        # Finding the busiest users in the group (Group level)
-        if selected_user == 'Overall':
-            st.title('Most Busy Users')
-            x, new_df = helper.most_busy_users(df)
-            col1, col2 = st.columns(2)
-
-            with col1:
-                fig, ax = plt.subplots()
-                ax.bar(x.index, x.values, color='red')
-                plt.xticks(rotation='vertical')
-                st.pyplot(fig)
-            with col2:
-                st.dataframe(new_df)
-
         # WordCloud
-        st.title("Wordcloud")
+        st.markdown("<div class='chart-container'><h2>WordCloud</h2></div>", unsafe_allow_html=True)
         df_wc = helper.create_wordcloud(selected_user, df)
         fig, ax = plt.subplots()
         ax.imshow(df_wc)
-        st.pyplot(fig)
-
-        # Most common words
-        most_common_df = helper.most_common_words(selected_user, df)
-        fig, ax = plt.subplots()
-        ax.barh(most_common_df[0], most_common_df[1])
-        plt.xticks(rotation='vertical')
-        st.title('Most common words')
+        ax.axis("off")
         st.pyplot(fig)
 
         # Emoji Analysis
+        st.markdown("<div class='chart-container'><h2>Emoji Analysis</h2></div>", unsafe_allow_html=True)
         emoji_df = helper.emoji_helper(selected_user, df)
-        st.title("Emoji Analysis")
         col1, col2 = st.columns(2)
 
         with col1:
             st.dataframe(emoji_df)
+
         with col2:
             fig, ax = plt.subplots()
             ax.pie(emoji_df[1].head(), labels=emoji_df[0].head(), autopct="%0.2f")
             st.pyplot(fig)
-
-    # Sentiment Analysis
-    if st.sidebar.button("Show Sentiment Analysis"):
-        sentiments = helper.sentiment_analysis(selected_user, df)
-        st.title("Sentiment Analysis")
-
-        fig, ax = plt.subplots()
-        ax.pie(
-            sentiments.values,
-            labels=sentiments.index,
-            autopct="%0.1f%%",
-            startangle=90,
-            colors=['green', 'red', 'blue']
-        )
-        st.pyplot(fig)
-
-    # Active Hours
-    if st.sidebar.button("Show Active Hours"):
-        st.title("User's Active Hours")
-        active_hours = helper.active_hours(selected_user, df)
-
-        fig, ax = plt.subplots()
-        ax.plot(active_hours.index, active_hours.values, color='orange')
-        plt.xlabel("Hour of the Day")
-        plt.ylabel("Message Count")
-        plt.grid()
-        st.pyplot(fig)
-
-    # Response Time Analysis
-    if selected_user == 'Overall' and st.sidebar.button("Show Response Time Analysis"):
-        avg_response_time = helper.response_time_analysis(df)
-        st.title("Response Time Analysis")
-        st.write(f"Average response time in the group: {avg_response_time:.2f} minutes")
-
-    # Keyword Analysis
-    keyword = st.sidebar.text_input("Enter a keyword to analyze")
-    if keyword and st.sidebar.button("Show Keyword Analysis"):
-        try:
-            keyword_count = helper.keyword_analysis(keyword, df)
-            st.title("Keyword Analysis")
-            st.write(f"The keyword '{keyword}' appears {keyword_count} times in the chat.")
-        except Exception as e:
-            st.error(f"An error occurred during keyword analysis: {e}")
