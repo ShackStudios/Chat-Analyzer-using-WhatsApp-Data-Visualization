@@ -1,18 +1,111 @@
-guys
-aur
-batch
-attendance
-kuch
-are
-of
-bhai
-ho
-class
-for
-tha
-aditya
-nhi
-koi
-kal
+.
+..
+...
 ?
+'''
+1
+2
+3
+4
+5
+6
+7
+8
+9
+wants
+need
+should
+could
+would
+shouldn't
+can't
+don't
+she's
+he's
+didn't
+does
+have
+good
+going
+going to
+got to
+kind of
+sort of
+trying to
+want to be
+let me
+hai
+ho
+kya
+ka
 ki
+ke
+kar
+karte
+karna
+hona
+nahi
+haan
+nahin
+tum
+main
+mujhe
+hum
+apna
+mera
+teri
+uska
+unka
+iske
+uski
+inka
+unka
+sab
+kyon
+kyunki
+par
+aur
+ab
+to
+jo
+se
+bhi
+ye
+wo
+ho gaya
+chahiye
+kitna
+kuch
+bahut
+kaun
+ek
+do
+teen
+chalo
+karo
+bas
+kyu
+pehle
+phir
+abhi
+log
+aise
+mat
+jab
+tab
+agar
+kyu nahi
+acha
+theek hai
+samajh gaya
+kya baat
+nahi pata
+jaldi karo
+bahut achha
+kya kar rahe
+kaha ho
+ho gaya
+kya chal raha
+sab theek hai
+kaha ja rahe
+

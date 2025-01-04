@@ -3,42 +3,41 @@ from wordcloud import WordCloud
 import pandas as pd
 from collections import Counter
 import emoji
+from textblob import TextBlob  # Required for sentiment analysis
 
 extract = URLExtract()
 
-import os
-
 def fetch_stats(selected_user, df):
-    # Use a relative path to the file
-    file_path = os.path.join(os.path.dirname(__file__), 'stop_hinglish.txt')
-    
-    # Ensure the file exists before attempting to open it
-    if not os.path.isfile(file_path):
-        raise FileNotFoundError(f"The file {file_path} does not exist.")
-    
-    with open(file_path, 'r') as f:
-        # Your existing code to process the file
-        # For example:
-        stop_words = f.read().splitlines()
-        # Process stop_words and continue with your function logic
-        # ...
-        pass
+    if selected_user != 'Overall':
+        df = df[df['user'] == selected_user]
 
-    # Return the required values
-    return num_messages, words, num_media_messages, num_links
+    # Fetch the number of messages
+    num_messages = df.shape[0]
 
+    # Fetch the total number of words
+    words = []
+    for message in df['message']:
+        words.extend(message.split())
 
+    # Fetch number of media messages
+    num_media_messages = df[df['message'] == '<Media omitted>\n'].shape[0]
+
+    # Fetch number of links shared
+    links = []
+    for message in df['message']:
+        links.extend(extract.find_urls(message))
+
+    return num_messages, len(words), num_media_messages, len(links)
 
 def most_busy_users(df):
     x = df['user'].value_counts().head()
     df = round((df['user'].value_counts() / df.shape[0]) * 100, 2).reset_index().rename(
         columns={'index': 'name', 'user': 'percent'})
-    return x,df
+    return x, df
 
-def create_wordcloud(selected_user,df):
-
-    f = open('stop_hinglish.txt', 'r')
-    stop_words = f.read()
+def create_wordcloud(selected_user, df):
+    with open('stop_hinglish.txt', 'r') as f:
+        stop_words = f.read()
 
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
@@ -53,15 +52,14 @@ def create_wordcloud(selected_user,df):
                 y.append(word)
         return " ".join(y)
 
-    wc = WordCloud(width=500,height=500,min_font_size=10,background_color='white')
+    wc = WordCloud(width=500, height=500, min_font_size=10, background_color='white')
     temp['message'] = temp['message'].apply(remove_stop_words)
     df_wc = wc.generate(temp['message'].str.cat(sep=" "))
     return df_wc
 
-def most_common_words(selected_user,df):
-
-    f = open('stop_hinglish.txt','r')
-    stop_words = f.read()
+def most_common_words(selected_user, df):
+    with open('stop_hinglish.txt', 'r') as f:
+        stop_words = f.read()
 
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
@@ -79,20 +77,18 @@ def most_common_words(selected_user,df):
     most_common_df = pd.DataFrame(Counter(words).most_common(20))
     return most_common_df
 
-def emoji_helper(selected_user,df):
+def emoji_helper(selected_user, df):
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
 
     emojis = []
     for message in df['message']:
-        emojis.extend([c for c in message if c in emoji.UNICODE_EMOJI['en']])
+        emojis.extend([c for c in message if c in emoji.EMOJI_DATA])
 
     emoji_df = pd.DataFrame(Counter(emojis).most_common(len(Counter(emojis))))
-
     return emoji_df
 
-def monthly_timeline(selected_user,df):
-
+def monthly_timeline(selected_user, df):
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
 
@@ -103,38 +99,62 @@ def monthly_timeline(selected_user,df):
         time.append(timeline['month'][i] + "-" + str(timeline['year'][i]))
 
     timeline['time'] = time
-
     return timeline
 
-def daily_timeline(selected_user,df):
-
+def daily_timeline(selected_user, df):
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
 
     daily_timeline = df.groupby('only_date').count()['message'].reset_index()
-
     return daily_timeline
 
-def week_activity_map(selected_user,df):
-
+def week_activity_map(selected_user, df):
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
 
     return df['day_name'].value_counts()
 
-def month_activity_map(selected_user,df):
-
+def month_activity_map(selected_user, df):
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
 
     return df['month'].value_counts()
 
-def activity_heatmap(selected_user,df):
-
+def activity_heatmap(selected_user, df):
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
 
     user_heatmap = df.pivot_table(index='day_name', columns='period', values='message', aggfunc='count').fillna(0)
-
     return user_heatmap
 
+def sentiment_analysis(selected_user, df):
+    if selected_user != 'Overall':
+        df = df[df['user'] == selected_user]
+
+    sentiments = df['message'].apply(lambda x: TextBlob(x).sentiment.polarity)
+    df['Sentiment'] = sentiments.apply(lambda x: 'Positive' if x > 0 else ('Negative' if x < 0 else 'Neutral'))
+    return df['Sentiment'].value_counts()
+
+def keyword_analysis(keyword, df):
+    return df['message'].str.contains(keyword, case=False).sum()
+
+def message_type_analysis(selected_user, df):
+    if selected_user != 'Overall':
+        df = df[df['user'] == selected_user]
+
+    text_messages = df[~df['message'].str.contains('<Media omitted>\n') & ~df['message'].str.contains('http')].shape[0]
+    media_messages = df[df['message'] == '<Media omitted>\n'].shape[0]
+    link_messages = df[df['message'].str.contains('http')].shape[0]
+
+    return {'Text Messages': text_messages, 'Media Messages': media_messages, 'Link Messages': link_messages}
+
+def active_hours(selected_user, df):
+    if selected_user != 'Overall':
+        df = df[df['user'] == selected_user]
+
+    df['hour'] = df['date'].dt.hour
+    return df['hour'].value_counts().sort_index()
+
+def response_time_analysis(df):
+    df['time_diff'] = df['date'].diff().dt.total_seconds() / 60
+    return df['time_diff'].dropna().mean()
