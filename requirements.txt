@@ -1,7 +1,8 @@
 streamlit
 matplotlib
 seaborn
+pandas
+textblob
 urlextract
 wordcloud
-pandas
 emoji
