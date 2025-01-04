@@ -37,8 +37,33 @@ WhatsApp Chat Analyzer is a tool that provides insights into WhatsApp chat files
 2. Upload the file to the app.
 3. Select options from the sidebar to analyze statistics, timelines, emoji usage, and more!
 
----
 
+---
+### **Screenshots**
+
+#### **Home Page (File Upload)**
+![Home Page Screenshot](./screenshots/home_page.png)
+
+#### **WordCloud**
+![WordCloud Screenshot](./screenshots/wordcloud.png)
+
+#### **Response Time Analysis**
+![Response Time Screenshot](./screenshots/response_time.png)
+
+#### **Top Statistics**
+![Top Statistics Screenshot](./screenshots/statistics/top_statistics.png)
+
+#### **Monthly Timeline**
+![Monthly Timeline Screenshot](./screenshots/statistics/monthly_timeline.png)
+
+#### **Most Busy Users**
+![Most Busy Users Screenshot](./screenshots/statistics/busy_users.png)
+
+#### **Weekly Activity Map**
+![Weekly Activity Screenshot](./screenshots/statistics/weekly_activity.png)
+
+
+---
 ## **Live Demo**
 Check out the live app here: https://sciddhanto-whatsapp-chat-analyzer-app-dhu1ch.streamlit.app/
 
