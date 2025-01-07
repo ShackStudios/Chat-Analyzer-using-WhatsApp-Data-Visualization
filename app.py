@@ -3,14 +3,6 @@ import preprocessor, helper
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Load custom CSS
-def load_css(file_name):
-    with open(file_name) as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
-# Load the CSS
-load_css("styles.css")
-
 # Sidebar Title
 st.sidebar.title("WhatsApp Chat Analyzer")
 
@@ -34,39 +26,25 @@ if uploaded_file is not None:
     if st.sidebar.button("Show Analysis"):
         # Header Section
         st.markdown("""
-        <div class="container">
-            <div class="header">
-                <h1>WhatsApp Chat Analyzer</h1>
-                <p>Get insights into your chat conversations!</p>
-            </div>
+        <div>
+            <h1>WhatsApp Chat Analyzer</h1>
+            <p>Get insights into your chat conversations!</p>
         </div>
         """, unsafe_allow_html=True)
 
         # Top Statistics
         num_messages, words, num_media_messages, num_links = helper.fetch_stats(selected_user, df)
         st.markdown(f"""
-        <div class="flex-container">
-            <div class="metric-card">
-                <h2>Total Messages</h2>
-                <p>{num_messages}</p>
-            </div>
-            <div class="metric-card">
-                <h2>Total Words</h2>
-                <p>{words}</p>
-            </div>
-            <div class="metric-card">
-                <h2>Media Shared</h2>
-                <p>{num_media_messages}</p>
-            </div>
-            <div class="metric-card">
-                <h2>Links Shared</h2>
-                <p>{num_links}</p>
-            </div>
+        <div>
+            <h2>Total Messages: {num_messages}</h2>
+            <h2>Total Words: {words}</h2>
+            <h2>Media Shared: {num_media_messages}</h2>
+            <h2>Links Shared: {num_links}</h2>
         </div>
         """, unsafe_allow_html=True)
 
         # Monthly Timeline
-        st.markdown("<div class='chart-container'><h2>Monthly Timeline</h2></div>", unsafe_allow_html=True)
+        st.title("Monthly Timeline")
         timeline = helper.monthly_timeline(selected_user, df)
         fig, ax = plt.subplots()
         ax.plot(timeline['time'], timeline['message'], color='green')
@@ -74,7 +52,7 @@ if uploaded_file is not None:
         st.pyplot(fig)
 
         # Daily Timeline
-        st.markdown("<div class='chart-container'><h2>Daily Timeline</h2></div>", unsafe_allow_html=True)
+        st.title("Daily Timeline")
         daily_timeline = helper.daily_timeline(selected_user, df)
         fig, ax = plt.subplots()
         ax.plot(daily_timeline['only_date'], daily_timeline['message'], color='black')
@@ -82,11 +60,11 @@ if uploaded_file is not None:
         st.pyplot(fig)
 
         # Activity Map
-        st.markdown("<div class='chart-container'><h2>Activity Map</h2></div>", unsafe_allow_html=True)
+        st.title("Activity Map")
         col1, col2 = st.columns(2)
 
         with col1:
-            st.markdown("<h3>Most Busy Day</h3>", unsafe_allow_html=True)
+            st.header("Most Busy Day")
             busy_day = helper.week_activity_map(selected_user, df)
             fig, ax = plt.subplots()
             ax.bar(busy_day.index, busy_day.values, color='purple')
@@ -94,7 +72,7 @@ if uploaded_file is not None:
             st.pyplot(fig)
 
         with col2:
-            st.markdown("<h3>Most Busy Month</h3>", unsafe_allow_html=True)
+            st.header("Most Busy Month")
             busy_month = helper.month_activity_map(selected_user, df)
             fig, ax = plt.subplots()
             ax.bar(busy_month.index, busy_month.values, color='orange')
@@ -102,7 +80,7 @@ if uploaded_file is not None:
             st.pyplot(fig)
 
         # WordCloud
-        st.markdown("<div class='chart-container'><h2>WordCloud</h2></div>", unsafe_allow_html=True)
+        st.title("WordCloud")
         df_wc = helper.create_wordcloud(selected_user, df)
         fig, ax = plt.subplots()
         ax.imshow(df_wc)
@@ -110,7 +88,7 @@ if uploaded_file is not None:
         st.pyplot(fig)
 
         # Emoji Analysis
-        st.markdown("<div class='chart-container'><h2>Emoji Analysis</h2></div>", unsafe_allow_html=True)
+        st.title("Emoji Analysis")
         emoji_df = helper.emoji_helper(selected_user, df)
         col1, col2 = st.columns(2)
 
