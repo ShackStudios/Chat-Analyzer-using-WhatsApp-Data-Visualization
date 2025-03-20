@@ -27,6 +27,7 @@
 - **Streamlit**: For creating the web app.
 - **Matplotlib/Seaborn**: For visualizations.
 - **Pandas**: For data analysis.
+- **Natural Language Processing (NLP)**: For text preprocessing, sentiment analysis, and keyword extraction.
 - **TextBlob**: For sentiment analysis.
 - **WordCloud**: For generating word clouds.
 
