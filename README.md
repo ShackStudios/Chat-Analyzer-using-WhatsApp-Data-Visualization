@@ -1,4 +1,4 @@
-# WhatsApp Chat Analyzer
+# Chat Analyzer using WhatsApp Data Visualization
 
 **Description**  
 WhatsApp Chat Analyzer is a tool that provides insights into WhatsApp chat files. It allows users to upload chat exports and analyze key metrics such as:
